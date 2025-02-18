@@ -28,7 +28,7 @@ async def pred_checker(predchecker, ftqvalid, ftqbits, ref_instrRange, ref_instr
         if i == 0:
             fixedRange      = res[0]
             fixedTaken      = res[1]
-        else:
+        elif i == 1:
             fixedTarget     = res[0]
             fixedMissPred   = res[1]
             jalTarget       = res[2]
@@ -43,32 +43,42 @@ async def pred_checker(predchecker, ftqvalid, ftqbits, ref_instrRange, ref_instr
     falut_idx = -1
     ref_fixedTaken = [False for i in range(16)]
 
+    if i == 0:
     # ====== reference model ======
-
-    # instr Valid Range fix
-    for j in range(16):
-        ret_fault[j] = ref_pds[j][RET_LABEL] & ref_instrRange[j] & ref_instrValid[j] & (ftqbits > j & ftqvalid | (~ftqvalid))
-        jal_fault[j] = (ref_pds[j][BRTYPE_LABEL] == 2) & ref_instrRange[j] & ref_instrValid[j] & (ftqbits > j & ftqvalid | (~ftqvalid))
-        jalr_fault[j] = ref_pds[j][BRTYPE_LABEL] == 3 & ref_instrRange[j] & ref_instrValid[j] & (ftqbits > j & ftqvalid | (~ftqvalid))
-        if(ret_fault[j] | jal_fault[j] | jalr_fault[j]):
-            need_fixrange = True
-            falut_idx = j
-    if need_fixrange == True:
+    # instr Valid Range is needed to fix
         for j in range(16):
-                ref_fixedRange = False if (j > falut_idx) else True
-    else:
-        ref_fixedRange = ref_instrRange
+            ret_fault[j]  = ref_pds[j][RET_LABEL] & ref_instrRange[j] & ref_instrValid[j] & (ftqbits > j & ftqvalid | (~ftqvalid))
+            jal_fault[j]  = (ref_pds[j][BRTYPE_LABEL] == 2) & ref_instrRange[j] & ref_instrValid[j] & (ftqbits > j & ftqvalid | (~ftqvalid))
+            jalr_fault[j] = (ref_pds[j][BRTYPE_LABEL] == 3) & ref_instrRange[j] & ref_instrValid[j] & (ftqbits > j & ftqvalid | (~ftqvalid))
+            if(ret_fault[j] | jal_fault[j] | jalr_fault[j]):
+                need_fixrange = True
+                falut_idx = j
+        if need_fixrange == True:
+            for j in range(16):
+                    ref_fixedRange = False if (j > falut_idx) else True
+        else:
+            ref_fixedRange = ref_instrRange
 
-    # compare fixed valid range    
-    if(ref_fixedRange != fixedRange):
-        debug(f"fixedRange error, True Range mask:{ref_fixedRange} Fault Range mas:{fixedRange}") 
-        find_error += 1
-    
-    # TODO: fixed token
-    j = 15
-    while j >= 0:
-        ref_fixedTaken[j] = True if ((ref_fixedRange == True) & ()) else False
-        
+        # compare fixed valid range    
+        if(ref_fixedRange != fixedRange):
+            debug(f"fixedRange error, True Range mask:{ref_fixedRange} Fault Range mas:{fixedRange}") 
+            find_error += 1
 
+        # whether the instr is first CFI
+        j = 15
+        while j >= 0:
+            ref_fixedTaken[j] = True if ((ref_fixedRange == True) & (ref_instrValid) & ftqvalid # instr is valid, 
+                                                                                                # because first CFI's fixedRange must be ture, 
+                                                                                                # the others must be false
+                                        & ((ref_pds[j][BRTYPE_LABEL] == 2) | ref_pds[j][RET_LABEL]) # whether instr is CFI
+                                        ) else False
+
+        # compare fixedtaken
+        if(ref_fixedTaken != fixedTaken):
+            debug(f"fixedTaken error, True fixedTaken is :{ref_fixedTaken} Fault Range mas:{fixedTaken}") 
+            find_error += 1
+
+    elif i == 1:
+    # TODO: fixedMissPred
                 
 

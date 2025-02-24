@@ -14,5 +14,10 @@ async def test_fire(predchecker_env):
     pc = [0 for i in range(PREDICT_WIDTH)]
     pds = [{RVC_LABEL: True, RET_LABEL: False, BRTYPE_LABEL: 0 } for i in range(PREDICT_WIDTH)]
     tgt = 0
+
+    i = 0
     async for res in predchecker_env.predCheckerAgent.agent_pred_check(valid, bits, instrRange, instrValid, jumpOffset, pc, pds, tgt, True):
         print(res)
+        print(i)
+        i = i + 1    
+        print(res[0])

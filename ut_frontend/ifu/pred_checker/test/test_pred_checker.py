@@ -127,3 +127,17 @@ async def test_predchecker_smoke(predchecker_env: PredCheckerEnv):
     pds = [{RVC_LABEL: True, RET_LABEL: False, BRTYPE_LABEL: 0 } for i in range(PREDICT_WIDTH)]
     tgt = 0
     await pred_check(predchecker_env.predCheckerAgent,fvalid, bits, instrRange, instrValid, jumpOffset, pc, pds, tgt)
+
+
+N = 10
+T = 1 << 16
+@pytest.mark.toffee_tags(TAG_LONG_TIME_RUN)
+@toffee_test.testcase
+async def test_pred_checker_bpu_jal(pred_checker: PredCheckerEnv):
+    covered = -1
+    gr.add_watch_point(pred_checker,{
+
+                    }, name= "PRED_CHECKER_BPU_JAL")
+    gr.mark_function("PRED_CHECKER_BPU_JAL", test_pred_checker_bpu_jal)
+
+    await pred_check(predchecker_env.predCheckerAgent,fvalid, bits, instrRange, instrValid, jumpOffset, pc, pds, tgt)

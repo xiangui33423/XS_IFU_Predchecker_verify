@@ -11,7 +11,7 @@ async def pred_check(predchecker, ftqvalid, ftqbits, ref_instrRange, ref_instrVa
     """ compare the pred_checker result with the reference
 
     Args:
-        pred_checker    (warpper)   : the fixture of the PredChecker
+        pred_checker    (wartestcaseper)   : the fixture of the PredChecker
         ftqvalid        (bool)      : Predict the existence of jump instr(JAL) for ftq
         ftqbits         (int)       : num of jump instr for ftq
         ref_instrRange  (list[bool]): the list of whether the instr is within the valid instr range of ftq
@@ -133,11 +133,19 @@ N = 10
 T = 1 << 16
 @pytest.mark.toffee_tags(TAG_LONG_TIME_RUN)
 @toffee_test.testcase
-async def test_pred_checker_bpu_jal(pred_checker: PredCheckerEnv):
+async def test_pred_checker_bpu_jal(predchecker_env: PredCheckerEnv):
     covered = -1
-    gr.add_watch_point(pred_checker,{
+    gr.add_watch_point(predchecker_env,{
 
                     }, name= "PRED_CHECKER_BPU_JAL")
     gr.mark_function("PRED_CHECKER_BPU_JAL", test_pred_checker_bpu_jal)
-
+    pc = [0 for i in range(PREDICT_WIDTH)]
+    fvalid = False
+    bits = 0
+    jumpOffset = [0 for i in range(PREDICT_WIDTH)]
+    instrRange = [True for i in range(PREDICT_WIDTH)]
+    instrValid = [True for i in range(PREDICT_WIDTH)]
+    pds = [{RVC_LABEL: True, RET_LABEL: False, BRTYPE_LABEL: 2 } for i in range(PREDICT_WIDTH)]
+    tgt = 0
     await pred_check(predchecker_env.predCheckerAgent,fvalid, bits, instrRange, instrValid, jumpOffset, pc, pds, tgt)
+

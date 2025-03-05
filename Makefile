@@ -25,7 +25,7 @@ test_all: dut
 	@python3 run.py --config $(CFG) $(KV) -- $(REPORT) -vs ut_*/ $(args)
 
 test: dut
-	@python3 run.py --config $(CFG) $(KV) -- $(REPORT) -vs $(target) $(args)
+	python3 run.py --config $(CFG) $(KV) -- $(REPORT) -vs $(target) $(args)
 
 dut: rtl
 	@python3 run.py --config $(CFG) --build $(DUTS) $(args)

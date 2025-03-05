@@ -17,13 +17,13 @@ def pred_checker_cover_point(pred_checker):
     #   - bin NO_FIXED_RNAGE:   the instruction is not need to be fixed
     def _check_fixedrange(i,value = True):
         def check(pred_checker):
-            return (getattr(pred_checker,"io_out_stage1Out_fixedRange_%d")%i).value == value
+            return (getattr(pred_checker,"io_out_stage1Out_fixedRange_%d"%i)).value == value
         return check
     for i in range(16):
         g.add_watch_point(pred_checker, {
                 "FIXED_RANGE_%d"%i:  _check_fixedrange(i, True) ,
                 "NO_FIXED_RANGE_%d"%i: _check_fixedrange(i, False),
-                }, name = "PERD_CHECKER_FIEXEDRANGE")
+                }, name = "PERD_CHECKER_FIEXEDRANGE%d"%i, dynamic_bin=True)
     
     # Reverse mark function coverage to the check point
     def _M(name):
@@ -31,7 +31,7 @@ def pred_checker_cover_point(pred_checker):
         return module_name_with(name, "../test_pred_checker")
     
     # - mark PERD_CHECKER_FIEXEDRANGE
-    g.mark_function("PERD_CHECKER_FIEXEDRANGE", _M(bin_name=["FIXED_RANGE_*","NO_FIXED_RANGE_*"]),raise_error=False)
+    g.mark_function("PERD_CHECKER_FIEXEDRANGE", _M("test_pred_checker_bpu_jal"),bin_name=["FIXED_RANGE_*","NO_FIXED_RANGE_*"],raise_error=False)
 
     return g
  

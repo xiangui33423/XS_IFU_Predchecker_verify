@@ -133,19 +133,125 @@ N = 10
 T = 1 << 16
 @pytest.mark.toffee_tags(TAG_LONG_TIME_RUN)
 @toffee_test.testcase
-async def test_pred_checker_bpu_jal(predchecker_env: PredCheckerEnv):
+async def test_pred_checker_bpu_jal_1_1(predchecker_env: PredCheckerEnv):
     covered = -1
-    gr.add_watch_point(predchecker_env,{
+    # gr.add_watch_point(predchecker_env,{
 
-                    }, name= "PRED_CHECKER_BPU_JAL")
-    gr.mark_function("PRED_CHECKER_BPU_JAL", test_pred_checker_bpu_jal)
+    #                 }, name= "PRED_CHECKER_BPU_JAL")
+    # gr.mark_function("PRED_CHECKER_BPU_JAL", test_pred_checker_bpu_jal)
     pc = [0 for i in range(PREDICT_WIDTH)]
     fvalid = False
     bits = 0
     jumpOffset = [0 for i in range(PREDICT_WIDTH)]
     instrRange = [True for i in range(PREDICT_WIDTH)]
     instrValid = [True for i in range(PREDICT_WIDTH)]
-    pds = [{RVC_LABEL: True, RET_LABEL: False, BRTYPE_LABEL: 2 } for i in range(PREDICT_WIDTH)]
+    pds = [{RVC_LABEL: True, RET_LABEL: False, BRTYPE_LABEL: 0 } for i in range(PREDICT_WIDTH)]
     tgt = 0
     await pred_check(predchecker_env.predCheckerAgent,fvalid, bits, instrRange, instrValid, jumpOffset, pc, pds, tgt)
 
+@pytest.mark.toffee_tags(TAG_LONG_TIME_RUN)
+@toffee_test.testcase
+async def test_pred_checker_bpu_jal_1_2(predchecker_env: PredCheckerEnv):
+    pc = [0 for i in range(PREDICT_WIDTH)]
+    fvalid = True
+    bits = 0
+    jumpOffset = [0 for i in range(PREDICT_WIDTH)]
+    instrRange = [True]+[False for i in range(PREDICT_WIDTH-1)]
+    instrValid = [True for i in range(PREDICT_WIDTH)]
+    pds = [{RVC_LABEL: True, RET_LABEL: False, BRTYPE_LABEL: 0 }]+[{RVC_LABEL: True, RET_LABEL: False, BRTYPE_LABEL: 0 } for i in range(PREDICT_WIDTH-1)]
+    tgt=0
+    await pred_check(predchecker_env.predCheckerAgent,fvalid, bits, instrRange, instrValid, jumpOffset, pc, pds, tgt)
+
+@pytest.mark.toffee_tags(TAG_LONG_TIME_RUN)
+@toffee_test.testcase
+async def test_pred_checker_bpu_jal_2_1(predchecker_env: PredCheckerEnv):
+    pc = [0 for i in range(PREDICT_WIDTH)]
+    fvalid = False
+    bits = 0
+    jumpOffset = [0 for i in range(PREDICT_WIDTH)]
+    instrRange = [True]+[False for i in range(PREDICT_WIDTH-1)]
+    instrValid = [True for i in range(PREDICT_WIDTH)]
+    pds = [{RVC_LABEL: True, RET_LABEL: False, BRTYPE_LABEL: 0 }]+[{RVC_LABEL: True, RET_LABEL: False, BRTYPE_LABEL: 0 } for i in range(PREDICT_WIDTH-1)]
+    tgt=0
+    await pred_check(predchecker_env.predCheckerAgent,fvalid, bits, instrRange, instrValid, jumpOffset, pc, pds, tgt)
+
+@pytest.mark.toffee_tags(TAG_LONG_TIME_RUN)
+@toffee_test.testcase
+async def test_pred_checker_bpu_jal_2_2(predchecker_env: PredCheckerEnv):
+    pc = [0 for i in range(PREDICT_WIDTH)]
+    fvalid = True
+    bits = 2
+    jumpOffset = [0 for i in range(PREDICT_WIDTH)]
+    instrRange = [True,True,True]+[False for i in range(PREDICT_WIDTH-3)]
+    instrValid = [True for i in range(PREDICT_WIDTH)]
+    pds = [{RVC_LABEL: True, RET_LABEL: False, BRTYPE_LABEL: 0 } for i in range(3)]+[{RVC_LABEL: True, RET_LABEL: False, BRTYPE_LABEL: 0 } for i in range(PREDICT_WIDTH-3)]
+    tgt=0
+    await pred_check(predchecker_env.predCheckerAgent,fvalid, bits, instrRange, instrValid, jumpOffset, pc, pds, tgt)
+
+@pytest.mark.toffee_tags(TAG_LONG_TIME_RUN)
+@toffee_test.testcase
+async def test_pred_checker_bpu_ret_1_1(predchecker_env: PredCheckerEnv):
+    pc = [0 for i in range(PREDICT_WIDTH)]
+    fvalid = False
+    bits = 0
+    jumpOffset = [0 for i in range(PREDICT_WIDTH)]
+    instrRange = [True for i in range(PREDICT_WIDTH)]
+    instrValid = [True for i in range(PREDICT_WIDTH)]
+    pds = [{RVC_LABEL: True, RET_LABEL: False, BRTYPE_LABEL: 0 } for i in range(PREDICT_WIDTH)]
+    tgt = 0
+    await pred_check(predchecker_env.predCheckerAgent,fvalid, bits, instrRange, instrValid, jumpOffset, pc, pds, tgt)
+
+@pytest.mark.toffee_tags(TAG_LONG_TIME_RUN)
+@toffee_test.testcase
+async def test_pred_checker_bpu_ret_1_2(predchecker_env: PredCheckerEnv):
+    for j in range(16):
+        pc = [0 for i in range(PREDICT_WIDTH)]
+        fvalid = True
+        bits = j
+        jumpOffset = [0 for i in range(PREDICT_WIDTH)]
+        instrRange = [True for i in range(j+1)] + [False for i in range(PREDICT_WIDTH-1-j)]
+        instrValid = [True for i in range(PREDICT_WIDTH)]
+        pds = [{RVC_LABEL: True, RET_LABEL: False, BRTYPE_LABEL: 1 } for i in range(j+1)]+[{RVC_LABEL: True, RET_LABEL: False, BRTYPE_LABEL: 0 } for i in range(PREDICT_WIDTH-1-j)]
+        tgt = 0
+        await pred_check(predchecker_env.predCheckerAgent,fvalid, bits, instrRange, instrValid, jumpOffset, pc, pds, tgt)
+
+@pytest.mark.toffee_tags(TAG_LONG_TIME_RUN)
+@toffee_test.testcase
+async def test_pred_checker_bpu_ret_2_1(predchecker_env: PredCheckerEnv):
+    pc = [0 for i in range(PREDICT_WIDTH)]
+    fvalid = False
+    bits = 0
+    j = 0
+    jumpOffset = [0 for i in range(PREDICT_WIDTH)]
+    instrRange = [True for i in range(j+1)] + [False for i in range(PREDICT_WIDTH-1-j)]
+    instrValid = [True for i in range(PREDICT_WIDTH)]
+    pds = [{RVC_LABEL: True, RET_LABEL: False, BRTYPE_LABEL: 1 } for i in range(j+1)]+[{RVC_LABEL: True, RET_LABEL: False, BRTYPE_LABEL: 0 } for i in range(PREDICT_WIDTH-1-j)]
+    tgt = 0
+    await pred_check(predchecker_env.predCheckerAgent,fvalid, bits, instrRange, instrValid, jumpOffset, pc, pds, tgt)
+
+@pytest.mark.toffee_tags(TAG_LONG_TIME_RUN)
+@toffee_test.testcase
+async def test_pred_checker_bpu_ret_2_2(predchecker_env: PredCheckerEnv):
+    for j in range(16):
+        pc = [0 for i in range(PREDICT_WIDTH)]
+        fvalid = False
+        bits = 0
+        jumpOffset = [0 for i in range(PREDICT_WIDTH)]
+        instrRange = [True for i in range(j+1)] + [False for i in range(PREDICT_WIDTH-1-j)]
+        instrValid = [True for i in range(PREDICT_WIDTH)]
+        pds = [{RVC_LABEL: True, RET_LABEL: False, BRTYPE_LABEL: 1 } for i in range(j+1)]+[{RVC_LABEL: True, RET_LABEL: False, BRTYPE_LABEL: 0 } for i in range(PREDICT_WIDTH-1-j)]
+        tgt = 0
+        await pred_check(predchecker_env.predCheckerAgent,fvalid, bits, instrRange, instrValid, jumpOffset, pc, pds, tgt)
+
+@pytest.mark.toffee_tags(TAG_LONG_TIME_RUN)
+@toffee_test.testcase
+async def test_pred_checker_bpu_jal_3_1(predchecker_env: PredCheckerEnv):
+    pc = [0 for i in range(PREDICT_WIDTH)]
+    fvalid = False
+    bits = 0
+    jumpOffset = [0 for i in range(PREDICT_WIDTH)]
+    instrRange = [True]+[False for i in range(PREDICT_WIDTH-1)]
+    instrValid = [True for i in range(PREDICT_WIDTH)]
+    pds = [{RVC_LABEL: True, RET_LABEL: False, BRTYPE_LABEL: 0 }]+[{RVC_LABEL: True, RET_LABEL: False, BRTYPE_LABEL: 0 } for i in range(PREDICT_WIDTH-1)]
+    tgt=0
+    await pred_check(predchecker_env.predCheckerAgent,fvalid, bits, instrRange, instrValid, jumpOffset, pc, pds, tgt)

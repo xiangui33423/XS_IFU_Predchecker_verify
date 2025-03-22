@@ -19,11 +19,27 @@ def pred_checker_cover_point(pred_checker):
         def check(pred_checker):
             return (getattr(pred_checker,"io_out_stage1Out_fixedRange_%d"%i)).value == value
         return check
+    g.add_watch_point(pred_checker, {
+                "FIXED_RANGE_0":  _check_fixedrange(0, True) ,
+                }, name = "PERD_CHECKER_FIEXEDRANGE_0", dynamic_bin=True)
+    for i in range(15):
+        g.add_watch_point(pred_checker, {
+                "FIXED_RANGE_%d"%i:  _check_fixedrange(i+1, True) ,
+                "NO_FIXED_RANGE_%d"%i: _check_fixedrange(i+1, False),
+                }, name = "PERD_CHECKER_FIEXEDRANGE%d"%(i+1), dynamic_bin=True)
+        
+    # 1.Add point PERD_CHECKER_FIEXEDTAKEN to check fixedrange return value:
+    #   - bin FIXED_TAKEN:      the instruction is the first instruction of the FTQ
+    #   - bin NO_FIXED_RNAGE:   the instruction is not the first instruction of the FTQ
+    def _check_fixedtaken(i,value = True):
+        def check(pred_checker):
+            return (getattr(pred_checker,"io_out_stage1Out_fixedTaken_%d"%i)).value == value
+        return check
     for i in range(16):
         g.add_watch_point(pred_checker, {
-                "FIXED_RANGE_%d"%i:  _check_fixedrange(i, True) ,
-                "NO_FIXED_RANGE_%d"%i: _check_fixedrange(i, False),
-                }, name = "PERD_CHECKER_FIEXEDRANGE%d"%i, dynamic_bin=True)
+                "FIXED_TAKEN_%d"%i:  _check_fixedtaken(i, True) ,
+                "NO_FIXED_TAKEN_%d"%i: _check_fixedtaken(i, False),
+                }, name = "PERD_CHECKER_FIEXEDTAKEN%d"%i, dynamic_bin=True)
     
     # Reverse mark function coverage to the check point
     def _M(name):

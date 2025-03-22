@@ -12,7 +12,7 @@ class PredCheckerAgent(Agent):
         self.bundle.io._in._ftqOffset._bits.value = ftqOffBits
         self.bundle.io._in._target.value = tgt
         self.bundle.io._in._fire_in.value = fire
-        print("binds_single_finished")
+        # print("binds_single_finished")
         for i in range(PREDICT_WIDTH):
             getattr(self.bundle.io._in._pc, f'_{i}').value = pc[i]
             getattr(self.bundle.io._in._instrRange, f'_{i}').value = instrRange[i]
